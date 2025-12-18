@@ -2,9 +2,9 @@ boto3==1.35.40
 pymongo==4.10.1
 uvicorn==0.23.2
 fastapi[standard]==0.110.3
-langchain==0.3.3
+langchain==0.3.26
 langchain-cli==0.0.31
-langchain-community==0.3.2
+langchain-community==0.3.27
 langserve[all]==0.3.0
 langchain-mongodb==0.2.0
 langchain-aws==0.2.2

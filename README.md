@@ -26,17 +26,19 @@ A public-facing storefront showcasing partner integrations with MongoDB Atlas. T
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/mongodb-partners/solutions-library.git
+git clone https://github.com/mohammaddaoudfarooqi/solutions-library.git
 cd solutions-library
 
-# 2. Configure environment 
+# 2. Configure environment
 cp .env.example .env
-# Edit .env with credentials
+# Edit .env with your MongoDB URI and API keys
 
-# 3. Run docker setup (Deploy everything and launch the app)
-./scripts/docker_setup.sh
+# 3. Start services
+docker-compose -f docker/docker-compose.yml up -d
+
+# 4. Open the Solutions Library
+open http://localhost:3000
 ```
-
 
 ## Architecture
 
