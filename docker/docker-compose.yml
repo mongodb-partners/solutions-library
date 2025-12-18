@@ -1,0 +1,313 @@
+services:
+  # ===========================================
+  # Main Solutions Library UI
+  # ===========================================
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "${WEB_PORT:-3100}:3100"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - solutions-network
+
+  # ===========================================
+  # API Gateway (Nginx)
+  # ===========================================
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "${GATEWAY_PORT:-8080}:8080"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+    networks:
+      - solutions-network
+
+  # ===========================================
+  # Temporal Fraud Detection Solution
+  # Reference implementation - uses existing Dockerfile
+  # ===========================================
+  temporal-fraud-detection-api:
+    build:
+      context: ../reference/maap-temporal-ai-agent-qs
+      dockerfile: Dockerfile
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "${TEMPORAL_API_PORT:-8001}:8000"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TEMPORAL_HOST=temporal:7233
+    networks:
+      - solutions-network
+      - temporal-network
+    restart: unless-stopped
+
+  temporal-fraud-detection-ui:
+    build:
+      context: ../reference/maap-temporal-ai-agent-qs
+      dockerfile: Dockerfile
+    command: streamlit run app.py --server.port 8505 --server.address 0.0.0.0
+    ports:
+      - "${TEMPORAL_UI_PORT:-8505}:8505"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - API_BASE_URL=http://temporal-fraud-detection-api:8000/api
+    depends_on:
+      - temporal-fraud-detection-api
+    networks:
+      - solutions-network
+      - temporal-network
+    restart: unless-stopped
+
+  temporal-worker:
+    build:
+      context: ../reference/maap-temporal-ai-agent-qs
+      dockerfile: Dockerfile
+    command: python -m temporal.run_worker
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TEMPORAL_HOST=temporal:7233
+    networks:
+      - temporal-network
+    restart: unless-stopped
+
+  # ===========================================
+  # Temporal Server (required for Temporal solution)
+  # ===========================================
+  temporal:
+    image: temporalio/auto-setup:1.24
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=temporal-postgresql
+    depends_on:
+      - temporal-postgresql
+    networks:
+      - temporal-network
+
+  temporal-postgresql:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=temporal
+      - POSTGRES_PASSWORD=temporal
+    volumes:
+      - temporal-postgresql-data:/var/lib/postgresql/data
+    networks:
+      - temporal-network
+
+  temporal-ui:
+    image: temporalio/ui:2.26.2
+    ports:
+      - "8088:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+    networks:
+      - temporal-network
+
+  # ===========================================
+  # Cohere Semantic Search Solution
+  # ===========================================
+  cohere-semantic-search:
+    build:
+      context: ../reference/maap-cohere-qs
+      dockerfile: Dockerfile
+    ports:
+      - "${COHERE_UI_PORT:-8503}:8080"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  # ===========================================
+  # LangChain Research Agent Solution
+  # ===========================================
+  langchain-research-agent:
+    build:
+      context: ../reference/langchain-qs
+      dockerfile: Dockerfile
+    ports:
+      - "${LANGCHAIN_UI_PORT:-8504}:8505"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MONGODB_COLLECTION=rag
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  # ===========================================
+  # Fireworks AI Inference Solution
+  # ===========================================
+  fireworks-backend:
+    build:
+      context: ../reference/mdb-bfsi-credit-reco-genai/backend_agentic
+      dockerfile: Dockerfile
+    ports:
+      - "${FIREWORKS_API_PORT:-8006}:5001"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MONGO_CONNECTION_STRING=${MONGODB_URI}
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  fireworks-frontend:
+    build:
+      context: ../reference/mdb-bfsi-credit-reco-genai/frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://fireworks-backend:5001
+    ports:
+      - "${FIREWORKS_UI_PORT:-8506}:3000"
+    env_file:
+      - ../.env
+    environment:
+      - NEXT_PUBLIC_API_URL=http://fireworks-backend:5001
+    depends_on:
+      - fireworks-backend
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  # ===========================================
+  # Anthropic Document Assistant Solution
+  # ===========================================
+  anthropic-logger:
+    build:
+      context: ../reference/maap-anthropic-qs/MAAP-AWS-Anthropic/logger
+      dockerfile: Dockerfile
+    image: anthropic-logger
+    env_file:
+      - ../.env
+    environment:
+      - PORT=8181
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  anthropic-loader:
+    build:
+      context: ../reference/maap-anthropic-qs/MAAP-AWS-Anthropic/loader
+      dockerfile: Dockerfile
+    image: anthropic-loader
+    env_file:
+      - ../.env
+    environment:
+      - PORT=8001
+    depends_on:
+      - anthropic-logger
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  anthropic-main:
+    build:
+      context: ../reference/maap-anthropic-qs/MAAP-AWS-Anthropic/main
+      dockerfile: Dockerfile
+    image: anthropic-main
+    env_file:
+      - ../.env
+    environment:
+      - PORT=8000
+    depends_on:
+      - anthropic-logger
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  anthropic-ui:
+    build:
+      context: ../reference/maap-anthropic-qs/MAAP-AWS-Anthropic/ui
+      dockerfile: Dockerfile
+    image: anthropic-ui
+    env_file:
+      - ../.env
+    environment:
+      - PORT=7860
+    depends_on:
+      - anthropic-loader
+      - anthropic-main
+      - anthropic-logger
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  anthropic-nginx:
+    build:
+      context: ../reference/maap-anthropic-qs/MAAP-AWS-Anthropic/nginx
+      dockerfile: Dockerfile
+    image: anthropic-nginx
+    ports:
+      - "${ANTHROPIC_UI_PORT:-8502}:7860"
+    depends_on:
+      - anthropic-ui
+      - anthropic-main
+      - anthropic-loader
+      - anthropic-logger
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  # ===========================================
+  # TogetherAI Open-Source LLM Solution
+  # ===========================================
+  togetherai-backend:
+    image: public.ecr.aws/s2e1n3u8/maap-togetherai-qs/backend:latest
+    ports:
+      - "${TOGETHERAI_API_PORT:-8007}:8000"
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_NAME=${TOGETHERAI_DB_NAME:-togetherai_opensource}
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  togetherai-frontend:
+    image: public.ecr.aws/s2e1n3u8/maap-togetherai-qs/frontend:latest
+    ports:
+      - "${TOGETHERAI_UI_PORT:-8507}:7860"
+    env_file:
+      - ../.env
+    environment:
+      - BACKEND_URL=http://togetherai-backend:8000
+    depends_on:
+      - togetherai-backend
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+networks:
+  solutions-network:
+    driver: bridge
+  temporal-network:
+    driver: bridge
+
+volumes:
+  temporal-postgresql-data:

@@ -1,0 +1,27 @@
+{
+  "id": "cohere-semantic-search",
+  "name": "Semantic Search Engine",
+  "partner": {
+    "name": "Cohere",
+    "logo": "/logos/cohere.svg",
+    "website": "https://cohere.com"
+  },
+  "description": "Semantic search with Cohere embeddings and MongoDB Atlas Vector Search for intelligent content discovery.",
+  "longDescription": "Implement powerful semantic search capabilities using Cohere embeddings. This solution demonstrates embedding generation, vector indexing, and reranking for highly relevant search results across large document collections.",
+  "valueProposition": [
+    "State-of-the-art embeddings with Cohere",
+    "Reranking for improved result relevance",
+    "Scalable vector search with MongoDB Atlas",
+    "RAG-ready architecture"
+  ],
+  "technologies": ["Cohere", "MongoDB Atlas", "Vector Search", "Python", "Streamlit"],
+  "category": "Semantic Search",
+  "demoUrl": "http://localhost:8503",
+  "sourceUrl": "https://github.com/mongodb-partners/maap-cohere-qs",
+  "documentation": "/docs/cohere-semantic-search",
+  "ports": {
+    "api": 8003,
+    "ui": 8503
+  },
+  "status": "active"
+}

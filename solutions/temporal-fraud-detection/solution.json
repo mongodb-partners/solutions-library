@@ -1,0 +1,29 @@
+{
+  "id": "temporal-fraud-detection",
+  "name": "AI-Powered Fraud Detection",
+  "partner": {
+    "name": "Temporal",
+    "logo": "/logos/temporal.svg",
+    "website": "https://temporal.io"
+  },
+  "description": "Enterprise-grade financial fraud detection combining MongoDB Atlas vector search, Temporal workflows, and AI for real-time transaction analysis.",
+  "longDescription": "This solution demonstrates a complete fraud detection pipeline that processes financial transactions through an AI-powered decision system. It combines rule-based evaluation, vector similarity search for pattern matching, and advanced AI analysis to provide real-time approve/reject decisions with detailed reasoning.",
+  "valueProposition": [
+    "Durable workflow execution for mission-critical processes",
+    "Hybrid AI + vector search approach for advanced fraud detection",
+    "Complete audit trails with explainable AI reasoning",
+    "Human-in-the-loop escalation workflows"
+  ],
+  "technologies": ["Temporal", "MongoDB Atlas", "Vector Search", "AWS Bedrock", "Python", "FastAPI", "Streamlit"],
+  "category": "Workflow Orchestration",
+  "demoUrl": "http://localhost:8505",
+  "sourceUrl": "https://github.com/mongodb-partners/maap-temporal-ai-agent-qs",
+  "documentation": "/docs/temporal-fraud-detection",
+  "ports": {
+    "api": 8001,
+    "ui": 8505
+  },
+  "status": "active",
+  "featured": true,
+  "reference": "../reference/maap-temporal-ai-agent-qs"
+}

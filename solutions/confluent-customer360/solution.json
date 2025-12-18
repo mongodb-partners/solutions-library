@@ -1,0 +1,27 @@
+{
+  "id": "confluent-customer360",
+  "name": "Real-time Customer 360",
+  "partner": {
+    "name": "Confluent",
+    "logo": "/logos/confluent.svg",
+    "website": "https://confluent.io"
+  },
+  "description": "Event-driven analytics with Confluent Kafka and MongoDB Atlas for real-time data synchronization and customer insights.",
+  "longDescription": "Build real-time customer data platforms using Confluent Kafka. This solution demonstrates event streaming, data synchronization, and AI-powered chatbot integration for unified customer views.",
+  "valueProposition": [
+    "Real-time event streaming with Kafka",
+    "Unified customer data view",
+    "AI-powered query processing",
+    "Scalable event-driven architecture"
+  ],
+  "technologies": ["Confluent", "Kafka", "MongoDB Atlas", "Flink", "Python", "React"],
+  "category": "Event Streaming",
+  "demoUrl": "",
+  "sourceUrl": "https://github.com/mongodb-partners/maap-confluent-qs",
+  "documentation": "/docs/confluent-customer360",
+  "ports": {
+    "api": 8005,
+    "ui": 8508
+  },
+  "status": "coming-soon"
+}

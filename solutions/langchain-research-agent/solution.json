@@ -1,0 +1,27 @@
+{
+  "id": "langchain-research-agent",
+  "name": "Multi-Agent Research Assistant",
+  "partner": {
+    "name": "LangChain",
+    "logo": "/logos/langchain.svg",
+    "website": "https://langchain.com"
+  },
+  "description": "Composable AI applications with LangChain and LangGraph for multi-agent workflows, using MongoDB as memory and vector store.",
+  "longDescription": "Build sophisticated multi-agent systems with LangChain ecosystem. This solution demonstrates agent collaboration, dynamic LLM model switching, and graph-based workflow orchestration for complex research tasks.",
+  "valueProposition": [
+    "Multi-agent collaboration with LangGraph",
+    "Flexible LLM model selection",
+    "MongoDB as persistent memory store",
+    "Composable agent architecture"
+  ],
+  "technologies": ["LangChain", "LangGraph", "MongoDB Atlas", "Vector Search", "Python", "Streamlit"],
+  "category": "AI/LLM",
+  "demoUrl": "http://localhost:8504",
+  "sourceUrl": "https://github.com/mongodb-partners/langchain-qs",
+  "documentation": "/docs/langchain-research-agent",
+  "ports": {
+    "api": 8004,
+    "ui": 8504
+  },
+  "status": "active"
+}

@@ -1,0 +1,151 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Euclid Circular A', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f9fbfa;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-layout {
+  display: flex;
+  flex: 1;
+}
+
+.main-content {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  background-color: #f9fbfa;
+}
+
+/* Solution grid */
+.solution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+/* Solution card */
+.solution-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.solution-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.solution-card-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.solution-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.solution-card-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* Search and filter bar */
+.search-filter-bar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.search-filter-bar > * {
+  flex-shrink: 0;
+}
+
+/* Hero section */
+.hero-section {
+  background: linear-gradient(135deg, #00684A 0%, #001E2B 100%);
+  color: white;
+  padding: 48px 32px;
+  margin: -32px -32px 32px -32px;
+  border-radius: 0 0 8px 8px;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  max-width: 600px;
+}
+
+/* Solution detail page */
+.solution-detail {
+  max-width: 1200px;
+}
+
+.solution-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.solution-detail-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.solution-detail-info {
+  flex: 1;
+}
+
+.solution-detail-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Loading state */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 64px 32px;
+}

@@ -1,0 +1,28 @@
+{
+  "id": "anthropic-doc-assistant",
+  "name": "Intelligent Document Assistant",
+  "partner": {
+    "name": "Anthropic",
+    "logo": "/logos/anthropic.svg",
+    "website": "https://anthropic.com"
+  },
+  "description": "Enterprise AI assistant powered by Claude with MongoDB Atlas Vector Search for document Q&A and RAG-based retrieval.",
+  "longDescription": "Build intelligent document processing workflows with Claude AI. This solution showcases semantic search across documents, context-aware question answering, and multi-modal support for enterprise knowledge management.",
+  "valueProposition": [
+    "Persistent memory with semantic search",
+    "Document Q&A with RAG architecture",
+    "Multi-modal support for text and images",
+    "Enterprise-ready with user data isolation"
+  ],
+  "technologies": ["Claude", "MongoDB Atlas", "Vector Search", "AWS Bedrock", "Python", "FastAPI"],
+  "category": "AI/LLM",
+  "demoUrl": "http://localhost:8502",
+  "sourceUrl": "https://github.com/mongodb-partners/maap-anthropic-qs",
+  "documentation": "/docs/anthropic-doc-assistant",
+  "ports": {
+    "api": 8002,
+    "ui": 8502
+  },
+  "status": "active",
+  "featured": true
+}

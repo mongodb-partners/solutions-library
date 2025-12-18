@@ -1,0 +1,27 @@
+{
+  "id": "togetherai-opensource",
+  "name": "Open-Source LLM Platform",
+  "partner": {
+    "name": "TogetherAI",
+    "logo": "/logos/togetherai.svg",
+    "website": "https://together.ai"
+  },
+  "description": "Flexible, cost-effective AI with open-source models using TogetherAI and MongoDB for multi-agent collaboration.",
+  "longDescription": "Build AI applications with open-source models through TogetherAI. This solution demonstrates multi-agent collaboration, ensemble model responses, and strategic decision support.",
+  "valueProposition": [
+    "Open-source model flexibility",
+    "Multi-agent ensemble responses",
+    "Cost-effective AI deployment",
+    "Domain-specialized LLM collaboration"
+  ],
+  "technologies": ["TogetherAI", "MongoDB Atlas", "Python", "Gradio"],
+  "category": "AI/LLM",
+  "demoUrl": "http://localhost:8507",
+  "sourceUrl": "https://github.com/mongodb-partners/maap-together-qs",
+  "documentation": "/docs/togetherai-opensource",
+  "ports": {
+    "api": 8007,
+    "ui": 8507
+  },
+  "status": "active"
+}

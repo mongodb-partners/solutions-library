@@ -1,0 +1,27 @@
+{
+  "id": "fireworks-inference",
+  "name": "High-Performance AI Inference",
+  "partner": {
+    "name": "Fireworks",
+    "logo": "/logos/fireworks.svg",
+    "website": "https://fireworks.ai"
+  },
+  "description": "Cost-effective, high-throughput AI inference with Fireworks AI and MongoDB for structured outputs and function calling.",
+  "longDescription": "Demonstrate fast AI inference at scale with Fireworks AI. This solution showcases credit scoring, product recommendations, and agentic workflows with optimized inference performance.",
+  "valueProposition": [
+    "High-throughput AI inference",
+    "Cost-effective model hosting",
+    "Structured output generation",
+    "Agentic workflow support"
+  ],
+  "technologies": ["Fireworks AI", "MongoDB Atlas", "LangChain", "Python", "Flask", "React"],
+  "category": "AI/LLM",
+  "demoUrl": "http://localhost:8506",
+  "sourceUrl": "https://github.com/mongodb-partners/mdb-bfsi-credit-reco-genai",
+  "documentation": "/docs/fireworks-inference",
+  "ports": {
+    "api": 8006,
+    "ui": 8506
+  },
+  "status": "active"
+}

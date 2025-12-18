@@ -1,0 +1,37 @@
+{
+  "name": "mongodb-solutions-library",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MongoDB Partner Solutions Library - A storefront showcasing partner integrations with MongoDB Atlas",
+  "scripts": {
+    "dev": "pnpm --filter @mongodb/web dev",
+    "build": "pnpm --filter @mongodb/web build",
+    "preview": "pnpm --filter @mongodb/web preview",
+    "lint": "pnpm --filter @mongodb/web lint",
+    "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f docker/docker-compose.yml down",
+    "docker:build": "docker-compose -f docker/docker-compose.yml build",
+    "docker:logs": "docker-compose -f docker/docker-compose.yml logs -f"
+  },
+  "keywords": [
+    "mongodb",
+    "atlas",
+    "partners",
+    "solutions",
+    "ai",
+    "temporal",
+    "anthropic",
+    "cohere",
+    "langchain",
+    "confluent",
+    "fireworks",
+    "togetherai"
+  ],
+  "author": "MongoDB",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
