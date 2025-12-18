@@ -27,10 +27,33 @@ print_warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 
+ECR_REGISTRY="public.ecr.aws"
+
 echo "=========================================="
 echo "MongoDB Partner Solutions Library Setup"
 echo "=========================================="
 echo ""
+
+# Step 0: Setup ECR Public access
+setup_ecr_access() {
+    print_info "Setting up ECR Public access..."
+
+    # First, clear any cached expired credentials
+    docker logout "$ECR_REGISTRY" 2>/dev/null || true
+
+    # If AWS CLI is available, authenticate for better pull rates
+    if command -v aws &> /dev/null; then
+        print_info "AWS CLI found, authenticating with ECR Public..."
+        if aws ecr-public get-login-password --region us-east-1 2>/dev/null | \
+            docker login --username AWS --password-stdin "$ECR_REGISTRY" 2>/dev/null; then
+            print_status "Authenticated with ECR Public"
+        else
+            print_warning "Could not authenticate with AWS (anonymous access will be used)"
+        fi
+    else
+        print_info "AWS CLI not found, using anonymous access to ECR Public"
+    fi
+}
 
 # Step 1: Check prerequisites
 check_prerequisites() {
@@ -290,37 +313,42 @@ main() {
 
     # Step 1: Check prerequisites
     echo ""
-    echo "Step 1/7: Checking prerequisites..."
+    echo "Step 1/8: Checking prerequisites..."
     check_prerequisites
 
     # Step 2: Validate environment
     echo ""
-    echo "Step 2/7: Validating environment..."
+    echo "Step 2/8: Validating environment..."
     validate_environment
 
-    # Step 3: Pull images
+    # Step 3: Setup ECR access
     echo ""
-    echo "Step 3/7: Pulling Docker images..."
+    echo "Step 3/8: Setting up ECR access..."
+    setup_ecr_access
+
+    # Step 4: Pull images
+    echo ""
+    echo "Step 4/8: Pulling Docker images..."
     pull_images
 
-    # Step 4: Start services
+    # Step 5: Start services
     echo ""
-    echo "Step 4/7: Starting services..."
+    echo "Step 5/8: Starting services..."
     start_services
 
-    # Step 5: Wait for initialization
+    # Step 6: Wait for initialization
     echo ""
-    echo "Step 5/7: Waiting for initialization..."
+    echo "Step 6/8: Waiting for initialization..."
     wait_for_services
 
-    # Step 6: Setup data
+    # Step 7: Setup data
     echo ""
-    echo "Step 6/7: Setting up data..."
+    echo "Step 7/8: Setting up data..."
     setup_data
 
-    # Step 7: Verify services
+    # Step 8: Verify services
     echo ""
-    echo "Step 7/7: Verifying services..."
+    echo "Step 8/8: Verifying services..."
     verify_services
 
     # Print summary
