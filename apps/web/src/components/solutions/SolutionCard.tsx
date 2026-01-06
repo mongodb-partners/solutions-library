@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@leafygreen-ui/card';
 import Badge from '@leafygreen-ui/badge';
@@ -7,6 +8,7 @@ import Icon from '@leafygreen-ui/icon';
 import { css } from '@leafygreen-ui/emotion';
 import { Solution } from '../../types';
 import { getDemoUrl } from '../../utils/getDemoUrl';
+import { UsageEnquiryModal } from '../UsageEnquiryModal';
 
 const cardStyles = css`
   padding: 24px;
@@ -71,6 +73,7 @@ interface SolutionCardProps {
 
 export function SolutionCard({ solution }: SolutionCardProps) {
   const navigate = useNavigate();
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
 
   const handleCardClick = () => {
     navigate(`/solutions/${solution.id}`);
@@ -78,7 +81,7 @@ export function SolutionCard({ solution }: SolutionCardProps) {
 
   const handleLaunchDemo = (e: React.MouseEvent) => {
     e.stopPropagation();
-    window.open(getDemoUrl(solution.ports.ui), '_blank');
+    setShowEnquiryModal(true);
   };
 
   const handleViewDetails = (e: React.MouseEvent) => {
@@ -143,6 +146,14 @@ export function SolutionCard({ solution }: SolutionCardProps) {
           Details
         </Button>
       </div>
+
+      <UsageEnquiryModal
+        isOpen={showEnquiryModal}
+        onClose={() => setShowEnquiryModal(false)}
+        solutionId={solution.id}
+        solutionName={solution.name}
+        demoUrl={getDemoUrl(solution.ports.ui)}
+      />
     </Card>
   );
 }

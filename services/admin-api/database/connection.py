@@ -96,6 +96,7 @@ class Collections:
     TELEMETRY = "telemetry"
     API_KEYS = "api_keys"
     HOUSEKEEPING_TASKS = "housekeeping_tasks"
+    USAGE_ENQUIRIES = "usage_enquiries"
 
 
 # Convenience functions
@@ -162,3 +163,8 @@ def get_api_keys_collection():
 def get_housekeeping_tasks_collection():
     """Get the housekeeping_tasks collection."""
     return MongoDB.get_collection(Collections.HOUSEKEEPING_TASKS)
+
+
+def get_usage_enquiries_collection():
+    """Get the usage_enquiries collection."""
+    return MongoDB.get_collection(Collections.USAGE_ENQUIRIES)

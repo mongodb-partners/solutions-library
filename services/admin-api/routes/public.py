@@ -4,12 +4,14 @@ These endpoints are consumed by the public-facing UI.
 """
 
 from typing import Dict
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
 from repositories.solutions_repository import get_solutions_repository, SolutionsRepository
 from repositories.solution_overrides_repository import SolutionOverridesRepository
 from repositories.settings_repository import SettingsRepository
+from repositories.usage_enquiry_repository import UsageEnquiryRepository
+from models.usage_enquiry import UsageEnquiryCreate, UsageEnquiryResponse
 
 router = APIRouter(prefix="/public", tags=["Public"])
 
@@ -71,3 +73,42 @@ async def get_solution_statuses(
             statuses[solution.solution_id] = solution.status
 
     return SolutionStatusResponse(statuses=statuses)
+
+
+def _get_client_ip(request: Request) -> str:
+    """Extract client IP address from request."""
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _get_user_agent(request: Request) -> str:
+    """Extract user agent from request."""
+    return request.headers.get("user-agent", "unknown")
+
+
+@router.post("/usage-enquiry", response_model=UsageEnquiryResponse)
+async def submit_usage_enquiry(
+    request: Request,
+    body: UsageEnquiryCreate,
+) -> UsageEnquiryResponse:
+    """
+    Submit a usage enquiry for a demo.
+
+    This is a public endpoint (no auth required) that captures
+    user information before launching a demo.
+    """
+    ip_address = _get_client_ip(request)
+    user_agent = _get_user_agent(request)
+
+    enquiry = await UsageEnquiryRepository.create(
+        enquiry_data=body,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
+
+    return UsageEnquiryResponse(
+        enquiry_id=enquiry.enquiry_id,
+        message="Thank you for your interest! The demo will now launch.",
+    )

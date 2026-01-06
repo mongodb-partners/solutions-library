@@ -9,6 +9,7 @@ import { css } from '@leafygreen-ui/emotion';
 import { useState } from 'react';
 import { getSolutionById } from '../data/solutions';
 import { getDemoUrl } from '../utils/getDemoUrl';
+import { UsageEnquiryModal } from '../components/UsageEnquiryModal';
 
 const containerStyles = css`
   max-width: 1000px;
@@ -105,6 +106,7 @@ export function SolutionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
 
   const solution = id ? getSolutionById(id) : undefined;
 
@@ -121,7 +123,7 @@ export function SolutionDetailPage() {
   }
 
   const handleLaunchDemo = () => {
-    window.open(getDemoUrl(solution.ports.ui), '_blank');
+    setShowEnquiryModal(true);
   };
 
   return (
@@ -266,6 +268,14 @@ export function SolutionDetailPage() {
           </Tab>
         </Tabs>
       </Card>
+
+      <UsageEnquiryModal
+        isOpen={showEnquiryModal}
+        onClose={() => setShowEnquiryModal(false)}
+        solutionId={solution.id}
+        solutionName={solution.name}
+        demoUrl={getDemoUrl(solution.ports.ui)}
+      />
     </div>
   );
 }

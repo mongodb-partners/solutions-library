@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { solutions as allSolutions, filterSolutions } from './data/solutions'
 import type { Solution } from './types'
 import { getDemoUrl } from './utils/getDemoUrl'
+import { UsageEnquiryModal } from './components/UsageEnquiryModal'
 
 // Admin imports
 import { AuthProvider } from './admin/context'
@@ -50,109 +51,124 @@ function Header() {
 function SolutionCard({ solution }: { solution: Solution }) {
   const navigate = useNavigate()
   const { statuses } = useContext(StatusContext)
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false)
 
   // Get effective status: use admin override if available, otherwise use solution's default status
   const effectiveStatus = statuses[solution.id] || solution.status
   const isComingSoon = effectiveStatus === 'coming-soon' || !solution.demoUrl
 
+  const handleLaunchDemo = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowEnquiryModal(true)
+  }
+
   return (
-    <div
-      onClick={() => navigate(`/solutions/${solution.id}`)}
-      style={{
-        backgroundColor: 'white',
-        borderRadius: 8,
-        padding: 24,
-        cursor: 'pointer',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        transition: 'box-shadow 0.2s',
-      }}
-      onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-      onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <img
-          src={solution.partner.logo}
-          alt={solution.partner.name}
-          style={{ width: 48, height: 48, objectFit: 'contain', backgroundColor: '#f5f6f7', borderRadius: 8, padding: 8 }}
-          onError={(e) => { e.currentTarget.src = '/logos/placeholder.svg' }}
-        />
-        <div>
-          <h3 style={{ margin: 0, fontSize: '1.125rem' }}>{solution.name}</h3>
-          <span style={{ color: '#5c6c75', fontSize: '0.875rem' }}>{solution.partner.name}</span>
-        </div>
-        {solution.featured && (
-          <span style={{
-            marginLeft: 'auto',
-            backgroundColor: '#E3FCF7',
-            color: '#00684A',
-            padding: '4px 8px',
-            borderRadius: 4,
-            fontSize: '0.75rem',
-            fontWeight: 600
-          }}>
-            Featured
-          </span>
-        )}
-      </div>
-      <p style={{ color: '#5c6c75', marginBottom: 16 }}>{solution.description}</p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-        <span style={{ backgroundColor: '#f5f6f7', padding: '4px 8px', borderRadius: 4, fontSize: '0.75rem' }}>
-          {solution.category}
-        </span>
-        {solution.technologies.slice(0, 3).map((tech) => (
-          <span key={tech} style={{ backgroundColor: '#f5f6f7', padding: '4px 8px', borderRadius: 4, fontSize: '0.75rem' }}>
-            {tech}
-          </span>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 12 }}>
-        {isComingSoon ? (
-          <button
-            disabled
-            style={{
-              backgroundColor: '#889397',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
+    <>
+      <div
+        onClick={() => navigate(`/solutions/${solution.id}`)}
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 8,
+          padding: 24,
+          cursor: 'pointer',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          transition: 'box-shadow 0.2s',
+        }}
+        onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+        onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <img
+            src={solution.partner.logo}
+            alt={solution.partner.name}
+            style={{ width: 48, height: 48, objectFit: 'contain', backgroundColor: '#f5f6f7', borderRadius: 8, padding: 8 }}
+            onError={(e) => { e.currentTarget.src = '/logos/placeholder.svg' }}
+          />
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.125rem' }}>{solution.name}</h3>
+            <span style={{ color: '#5c6c75', fontSize: '0.875rem' }}>{solution.partner.name}</span>
+          </div>
+          {solution.featured && (
+            <span style={{
+              marginLeft: 'auto',
+              backgroundColor: '#E3FCF7',
+              color: '#00684A',
+              padding: '4px 8px',
               borderRadius: 4,
-              cursor: 'not-allowed',
-              fontWeight: 500,
-            }}
-          >
-            Coming Soon
-          </button>
-        ) : (
+              fontSize: '0.75rem',
+              fontWeight: 600
+            }}>
+              Featured
+            </span>
+          )}
+        </div>
+        <p style={{ color: '#5c6c75', marginBottom: 16 }}>{solution.description}</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+          <span style={{ backgroundColor: '#f5f6f7', padding: '4px 8px', borderRadius: 4, fontSize: '0.75rem' }}>
+            {solution.category}
+          </span>
+          {solution.technologies.slice(0, 3).map((tech) => (
+            <span key={tech} style={{ backgroundColor: '#f5f6f7', padding: '4px 8px', borderRadius: 4, fontSize: '0.75rem' }}>
+              {tech}
+            </span>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          {isComingSoon ? (
+            <button
+              disabled
+              style={{
+                backgroundColor: '#889397',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: 4,
+                cursor: 'not-allowed',
+                fontWeight: 500,
+              }}
+            >
+              Coming Soon
+            </button>
+          ) : (
+            <button
+              onClick={handleLaunchDemo}
+              style={{
+                backgroundColor: '#00684A',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontWeight: 500,
+              }}
+            >
+              Launch Demo
+            </button>
+          )}
           <button
-            onClick={(e) => { e.stopPropagation(); window.open(getDemoUrl(solution.ports.ui), '_blank') }}
+            onClick={(e) => { e.stopPropagation(); navigate(`/solutions/${solution.id}`) }}
             style={{
-              backgroundColor: '#00684A',
-              color: 'white',
-              border: 'none',
+              backgroundColor: 'white',
+              color: '#001e2b',
+              border: '1px solid #889397',
               padding: '8px 16px',
               borderRadius: 4,
               cursor: 'pointer',
               fontWeight: 500,
             }}
           >
-            Launch Demo
+            Details
           </button>
-        )}
-        <button
-          onClick={(e) => { e.stopPropagation(); navigate(`/solutions/${solution.id}`) }}
-          style={{
-            backgroundColor: 'white',
-            color: '#001e2b',
-            border: '1px solid #889397',
-            padding: '8px 16px',
-            borderRadius: 4,
-            cursor: 'pointer',
-            fontWeight: 500,
-          }}
-        >
-          Details
-        </button>
+        </div>
       </div>
-    </div>
+      <UsageEnquiryModal
+        isOpen={showEnquiryModal}
+        onClose={() => setShowEnquiryModal(false)}
+        solutionId={solution.id}
+        solutionName={solution.name}
+        demoUrl={getDemoUrl(solution.ports.ui)}
+      />
+    </>
   )
 }
 
@@ -247,6 +263,7 @@ function SolutionDetailPage() {
   const id = window.location.pathname.split('/').pop()
   const solution = allSolutions.find(s => s.id === id)
   const { statuses } = useContext(StatusContext)
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false)
 
   if (!solution) {
     return <div style={{ padding: 32 }}>Solution not found</div>
@@ -262,89 +279,102 @@ function SolutionDetailPage() {
 
   const isComingSoon = effectiveStatus === 'coming-soon' || !solution.demoUrl
 
+  const handleLaunchDemo = () => {
+    setShowEnquiryModal(true)
+  }
+
   return (
-    <div style={{ maxWidth: 1000 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginBottom: 32 }}>
-        <img
-          src={solution.partner.logo}
-          alt={solution.partner.name}
-          style={{ width: 80, height: 80, objectFit: 'contain', backgroundColor: '#f5f6f7', borderRadius: 8, padding: 12 }}
-        />
-        <div style={{ flex: 1 }}>
-          <h1 style={{ margin: '0 0 8px 0' }}>{solution.name}</h1>
-          <p style={{ color: '#5c6c75', margin: 0 }}>{solution.partner.name}</p>
+    <>
+      <div style={{ maxWidth: 1000 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginBottom: 32 }}>
+          <img
+            src={solution.partner.logo}
+            alt={solution.partner.name}
+            style={{ width: 80, height: 80, objectFit: 'contain', backgroundColor: '#f5f6f7', borderRadius: 8, padding: 12 }}
+          />
+          <div style={{ flex: 1 }}>
+            <h1 style={{ margin: '0 0 8px 0' }}>{solution.name}</h1>
+            <p style={{ color: '#5c6c75', margin: 0 }}>{solution.partner.name}</p>
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            {isComingSoon ? (
+              <button
+                disabled
+                style={{
+                  backgroundColor: '#889397',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: 4,
+                  cursor: 'not-allowed',
+                  fontWeight: 500,
+                }}
+              >
+                Coming Soon
+              </button>
+            ) : (
+              <button
+                onClick={handleLaunchDemo}
+                style={{
+                  backgroundColor: '#00684A',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                }}
+              >
+                Launch Demo
+              </button>
+            )}
+            {solution.sourceUrl && (
+              <button
+                onClick={() => window.open(solution.sourceUrl, '_blank')}
+                style={{
+                  backgroundColor: 'white',
+                  color: '#001e2b',
+                  border: '1px solid #889397',
+                  padding: '12px 24px',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                }}
+              >
+                View Source
+              </button>
+            )}
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 12 }}>
-          {isComingSoon ? (
-            <button
-              disabled
-              style={{
-                backgroundColor: '#889397',
-                color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: 4,
-                cursor: 'not-allowed',
-                fontWeight: 500,
-              }}
-            >
-              Coming Soon
-            </button>
-          ) : (
-            <button
-              onClick={() => window.open(getDemoUrl(solution.ports.ui), '_blank')}
-              style={{
-                backgroundColor: '#00684A',
-                color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: 4,
-                cursor: 'pointer',
-                fontWeight: 500,
-              }}
-            >
-              Launch Demo
-            </button>
-          )}
-          {solution.sourceUrl && (
-            <button
-              onClick={() => window.open(solution.sourceUrl, '_blank')}
-              style={{
-                backgroundColor: 'white',
-                color: '#001e2b',
-                border: '1px solid #889397',
-                padding: '12px 24px',
-                borderRadius: 4,
-                cursor: 'pointer',
-                fontWeight: 500,
-              }}
-            >
-              View Source
-            </button>
-          )}
+
+        <p style={{ fontSize: '1.125rem', lineHeight: 1.6, marginBottom: 32 }}>
+          {solution.longDescription || solution.description}
+        </p>
+
+        <h2>Value Proposition</h2>
+        <ul style={{ lineHeight: 1.8 }}>
+          {solution.valueProposition.map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+        </ul>
+
+        <h2>Technologies</h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {solution.technologies.map((tech) => (
+            <span key={tech} style={{ backgroundColor: '#f5f6f7', padding: '8px 12px', borderRadius: 4 }}>
+              {tech}
+            </span>
+          ))}
         </div>
       </div>
-
-      <p style={{ fontSize: '1.125rem', lineHeight: 1.6, marginBottom: 32 }}>
-        {solution.longDescription || solution.description}
-      </p>
-
-      <h2>Value Proposition</h2>
-      <ul style={{ lineHeight: 1.8 }}>
-        {solution.valueProposition.map((item, i) => (
-          <li key={i}>{item}</li>
-        ))}
-      </ul>
-
-      <h2>Technologies</h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {solution.technologies.map((tech) => (
-          <span key={tech} style={{ backgroundColor: '#f5f6f7', padding: '8px 12px', borderRadius: 4 }}>
-            {tech}
-          </span>
-        ))}
-      </div>
-    </div>
+      <UsageEnquiryModal
+        isOpen={showEnquiryModal}
+        onClose={() => setShowEnquiryModal(false)}
+        solutionId={solution.id}
+        solutionName={solution.name}
+        demoUrl={getDemoUrl(solution.ports.ui)}
+      />
+    </>
   )
 }
 
