@@ -84,7 +84,7 @@ services:
   # Temporal Server (required for Temporal solution)
   # ===========================================
   temporal:
-    image: temporalio/auto-setup:1.24
+    image: temporalio/auto-setup:latest
     ports:
       - "7233:7233"
     environment:
@@ -109,7 +109,7 @@ services:
       - temporal-network
 
   temporal-ui:
-    image: temporalio/ui:2.26.2
+    image: temporalio/ui:latest
     ports:
       - "8088:8080"
     environment:
@@ -161,7 +161,6 @@ services:
       - ../.env
     environment:
       - PYTHONUNBUFFERED=1
-      - MONGO_CONNECTION_STRING=${MONGODB_URI}
     networks:
       - solutions-network
     restart: unless-stopped

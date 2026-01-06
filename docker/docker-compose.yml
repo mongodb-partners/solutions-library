@@ -26,9 +26,41 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - web
+      - admin-api
     restart: unless-stopped
     networks:
       - solutions-network
+
+  # ===========================================
+  # Admin Dashboard API (Internal Only)
+  # ===========================================
+  admin-api:
+    build:
+      context: ../services/admin-api
+      dockerfile: Dockerfile
+    # NO external port mapping - internal only via gateway
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ADMIN_DB_NAME=${ADMIN_DB_NAME:-admin_dashboard}
+      - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET:-change-this-secret-in-production-min-32-chars}
+      - JWT_ACCESS_EXPIRY=${JWT_ACCESS_EXPIRY:-3600}
+      - JWT_REFRESH_EXPIRY=${JWT_REFRESH_EXPIRY:-604800}
+      - ADMIN_LOCKOUT_THRESHOLD=${ADMIN_LOCKOUT_THRESHOLD:-5}
+      - ADMIN_LOCKOUT_DURATION=${ADMIN_LOCKOUT_DURATION:-900}
+      - DEBUG=${DEBUG:-false}
+      - SOLUTIONS_DIR=/app/solutions
+    volumes:
+      - ../solutions:/app/solutions:ro
+    networks:
+      - solutions-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/admin/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ===========================================
   # Temporal Fraud Detection Solution
@@ -88,7 +120,7 @@ services:
   # Temporal Server (required for Temporal solution)
   # ===========================================
   temporal:
-    image: temporalio/auto-setup:1.24
+    image: temporalio/auto-setup:latest
     ports:
       - "7233:7233"
     environment:
@@ -113,7 +145,7 @@ services:
       - temporal-network
 
   temporal-ui:
-    image: temporalio/ui:2.26.2
+    image: temporalio/ui:latest
     ports:
       - "8088:8080"
     environment:
@@ -171,7 +203,6 @@ services:
       - ../.env
     environment:
       - PYTHONUNBUFFERED=1
-      - MONGO_CONNECTION_STRING=${MONGODB_URI}
     networks:
       - solutions-network
     restart: unless-stopped
