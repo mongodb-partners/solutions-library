@@ -143,6 +143,80 @@ docker-compose -f docker/docker-compose.yml up -d --build
 2. **Secrets**: Use secret management (AWS Secrets Manager, HashiCorp Vault)
 3. **Network**: Deploy in private VPC with bastion host
 4. **MongoDB**: Enable VPC Peering or Private Endpoints
+5. **CORS**: Configure allowed origins for cross-origin requests (see below)
+
+#### CORS Configuration
+
+All APIs enforce Cross-Origin Resource Sharing (CORS) restrictions to prevent unauthorized cross-origin requests. By default, only localhost origins are allowed for development.
+
+**For production deployments**, you must set the `ALLOWED_ORIGINS` environment variable with your actual domain(s).
+
+**Setting ALLOWED_ORIGINS:**
+
+```bash
+# In .env file - comma-separated list of allowed origins
+ALLOWED_ORIGINS=https://solutions.mongodb.com,https://admin.mongodb.com
+```
+
+**MongoDB.com Production Deployments:**
+
+For deployments on `*.mongodb.com` subdomains:
+
+```bash
+# Single subdomain
+ALLOWED_ORIGINS=https://solutions.mongodb.com
+
+# Multiple subdomains
+ALLOWED_ORIGINS=https://solutions.mongodb.com,https://partners.mongodb.com,https://admin.mongodb.com
+
+# Include both www and non-www if needed
+ALLOWED_ORIGINS=https://solutions.mongodb.com,https://www.solutions.mongodb.com
+```
+
+**AWS EC2 Deployments:**
+
+For deployments on EC2 instances, include your EC2 public DNS hostname:
+
+```bash
+# EC2 deployment with all service ports
+ALLOWED_ORIGINS=http://ec2-X-X-X-X.compute-1.amazonaws.com:3100,http://ec2-X-X-X-X.compute-1.amazonaws.com:8080,http://ec2-X-X-X-X.compute-1.amazonaws.com:8506,http://ec2-X-X-X-X.compute-1.amazonaws.com
+
+# Or use your custom domain
+ALLOWED_ORIGINS=https://your-domain.com,https://api.your-domain.com
+```
+
+Replace `ec2-X-X-X-X.compute-1.amazonaws.com` with your actual EC2 public DNS hostname.
+
+**Important Notes:**
+
+- Always use `https://` for production origins (not `http://`)
+- Do NOT use wildcards (`*`) in production - each origin must be explicitly listed
+- Include the full origin with protocol and port (if non-standard)
+- The Nginx gateway also validates origins - both must be configured
+
+**Nginx CORS Whitelist:**
+
+The Nginx gateway (`docker/nginx/nginx.conf`) has a built-in whitelist that allows:
+- `localhost` and `127.0.0.1` (any port)
+- Docker internal hostnames (`web`, etc.)
+- Any `*.mongodb.com` subdomain
+
+To add custom domains to Nginx, edit the `$cors_origin` map in `docker/nginx/nginx.conf`:
+
+```nginx
+map $http_origin $cors_origin {
+    default "";
+    "~^https?://localhost(:[0-9]+)?$" $http_origin;
+    "~^https?://127\.0\.0\.1(:[0-9]+)?$" $http_origin;
+    "~^https?://[^/]+\.mongodb\.com$" $http_origin;
+    # Add your custom domain pattern:
+    "~^https://your-domain\.com$" $http_origin;
+}
+```
+
+**Per-Service Configuration:**
+
+Each backend service reads `ALLOWED_ORIGINS` from the environment. The Docker Compose files pass this variable to all services automatically via `env_file: ../.env`.
 
 ### Performance
 
@@ -190,6 +264,13 @@ docker stats
 - Verify port 3000 is accessible
 - Check Nginx gateway configuration
 
+**CORS errors / API requests blocked:**
+- Check browser console for "Access-Control-Allow-Origin" errors
+- Verify `ALLOWED_ORIGINS` in `.env` includes your deployment hostname
+- For EC2: Include the full EC2 public DNS (e.g., `http://ec2-X-X-X-X.compute-1.amazonaws.com:8506`)
+- Rebuild affected services after changing `.env`: `docker compose up -d --build <service-name>`
+- Check Nginx CORS whitelist in `docker/nginx/nginx.conf` includes your domain pattern
+
 ### Health Checks
 
 ```bash
@@ -224,7 +305,21 @@ docker-compose -f docker/docker-compose.yml logs --tail=100 gateway
 | `GROQ_API_KEY` | Groq API key | For Temporal |
 | `VOYAGE_API_KEY` | Voyage AI API key | For embeddings |
 | `COHERE_API_KEY` | Cohere API key | For Cohere solution |
+| `ALLOWED_ORIGINS` | CORS allowed origins (comma-separated) | For production |
 | `WEB_PORT` | Web UI port | No (default: 3000) |
 | `GATEWAY_PORT` | Gateway port | No (default: 8080) |
 
 *Required for AWS Bedrock-based solutions
+
+### ALLOWED_ORIGINS Examples
+
+```bash
+# Development (default if not set)
+ALLOWED_ORIGINS=http://localhost:3100,http://localhost:3000
+
+# Production - MongoDB.com
+ALLOWED_ORIGINS=https://solutions.mongodb.com,https://partners.mongodb.com
+
+# Production - Custom domain
+ALLOWED_ORIGINS=https://myapp.example.com,https://admin.example.com
+```

@@ -17,8 +17,15 @@ from graph import get_app
 
 load_dotenv()
 
+# CORS configuration - use explicit origins, configurable via environment
+# Default origins for development; set ALLOWED_ORIGINS env var for production
+ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:8506,http://fireworks-frontend:3000"
+).split(",")
+
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": [origin.strip() for origin in ALLOWED_ORIGINS]}})
 
 
 @app.route("/login", methods=["POST"])

@@ -74,7 +74,7 @@ docker-compose -f docker/docker-compose.yml up temporal-fraud-detection-ui
 
 - [Architecture](docs/ARCHITECTURE.md) - System design and components
 - [Adding Solutions](docs/ADDING_SOLUTIONS.md) - How to add new partner integrations
-- [Deployment](docs/DEPLOYMENT.md) - Production deployment guide
+- [Deployment](docs/DEPLOYMENT.md) - Production deployment guide (includes CORS configuration)
 
 ## Technology Stack
 

@@ -90,19 +90,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration
-# Note: In production, this is internal-only so CORS is less critical
-# But we configure it for development and future flexibility
+# CORS configuration - explicit origins only, no wildcards even in debug mode
+# Origins configurable via ALLOWED_ORIGINS env var (comma-separated)
+import os
+CORS_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3100,http://localhost:3000,http://web:3100,http://127.0.0.1:3100"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.debug else [
-        "http://localhost:3100",
-        "http://localhost:3000",
-        "http://web:3100",
-    ],
+    allow_origins=[origin.strip() for origin in CORS_ORIGINS],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With"],
 )
 
 # Request logging middleware (logs ALL HTTP requests)
