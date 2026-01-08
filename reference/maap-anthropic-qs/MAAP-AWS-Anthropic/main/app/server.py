@@ -59,7 +59,7 @@ from app.logger import AsyncRemoteLogger
 
 # Create an instance of the logger
 logger = AsyncRemoteLogger(
-    service_url="http://logger:8181", app_name="MAAP-AWS-Anthropic-Main"
+    service_url="http://anthropic-logger:8181", app_name="MAAP-AWS-Anthropic-Main"
 )
 # Load environment variables from a .env file
 load_dotenv()

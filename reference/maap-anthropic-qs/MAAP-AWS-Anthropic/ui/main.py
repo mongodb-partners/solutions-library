@@ -345,7 +345,7 @@ with gr.Blocks(
             "Claude 3.5 Sonnet (US, v2)"
         ],
         [
-            "Explain https://www.mongodb.com/services/consulting/ai-applications-program",
+            "Explain https://www.mongodb.com/company/blog/technical/constitutional-ai-ethical-governance-with-atlas",
             "your.email@yourdomain.com",
             ["User Uploaded Data"],
             [
@@ -370,7 +370,7 @@ with gr.Blocks(
         ],
         [
             "Explain how MongoDB helped Ceto AI in Pioneering predictive analytics in maritime logistics?",
-            "mohammad.farooqi@mongodb.com",
+            "your.email@yourdomain.com",
             ["User Uploaded Data"],
             [
                 "MongoDB Hybrid Search",

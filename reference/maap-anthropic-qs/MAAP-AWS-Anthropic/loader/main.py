@@ -15,7 +15,7 @@ from logger import AsyncRemoteLogger
 
 # Create an instance of the logger
 logger = AsyncRemoteLogger(
-    service_url="http://logger:8181", app_name="MAAP-AWS-Anthropic-Loader"
+    service_url="http://anthropic-logger:8181", app_name="MAAP-AWS-Anthropic-Loader"
 )
 
 load_dotenv()
