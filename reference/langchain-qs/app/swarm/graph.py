@@ -1,7 +1,6 @@
-from .tools import (web_search_tool, 
-                    create_grader_handoff_tool, 
-                    create_rewrite_handoff_tool, 
-                    create_final_response_handoff_tool)
+from .tools import (web_search_tool,
+                    create_grader_handoff_tool,
+                    create_rewrite_handoff_tool)
 from .utils import memory_saver
 from langgraph.prebuilt import create_react_agent
 from langgraph_swarm import create_handoff_tool, create_swarm
@@ -29,8 +28,8 @@ def initialize_swarm_graph(model: BaseChatModel):
 
     george = create_react_agent(
         model,
-        [create_final_response_handoff_tool(model=model, agent_name="Eve", tool_name="Final response tool", tool_description="George use this tool to generate the final response to the user query")],
-        prompt="You are George, you have access to private knowledgebase and you are the final response generator",
+        [],  # No tools - George directly generates the final response
+        prompt="You are George, the final response generator. Your job is to provide a helpful, clear, and complete answer to the user's question based on the conversation context and any information gathered by the other agents. Always provide a direct answer - never say you need to transfer to another agent.",
         name="George",
     )
     import os

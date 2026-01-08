@@ -52,6 +52,7 @@ A modular, containerized full-stack solution for BFSI credit recommendation and 
     - [Limitations](#limitations)
     - [Deployment Steps](#deployment-steps)
     - [Post-Deployment Verification](#post-deployment-verification)
+- [Security](#security)
 - [License](#license)
 
 ## Architecture Overview
@@ -477,6 +478,33 @@ To customize the deployment:
 3. Try uploading a file to ensure the Loader Service is functioning correctly.
 4. Verify that the sample dataset bundled with the script is loaded into your MongoDB Cluster name `MongoDBFireworksV1` with the database `bfsi-genai` and collections `cc-products` and `user-data` by visiting the [MongoDB Atlas Console](https://cloud.mongodb.com).
 
+
+## Security
+
+This application includes the following security measures:
+
+### Container Security
+- All Docker containers run as non-root users
+- Security options (`no-new-privileges`) applied to prevent privilege escalation
+- Read-only filesystem where applicable
+
+### Application Security
+- Flask debug mode disabled in production
+- CORS configured with explicit origin whitelist
+- Input validation on API endpoints
+
+### Dependency Security
+Updated dependencies to address known vulnerabilities:
+- `pymongo>=4.10.1` - Fixes CVE-2024-5629 (out-of-bounds read)
+- `langchain>=0.3.26`, `langchain-core>=0.3.29` - Multiple security patches
+- `flask>=3.0.2` - Security updates
+- Node.js dependencies updated via `npm audit fix`
+
+### Security Recommendations
+- Always use environment variables for sensitive configuration
+- Rotate API keys regularly
+- Use MongoDB Atlas IP Access List to restrict database access
+- Enable MongoDB Atlas audit logging for compliance
 
 ## License
 

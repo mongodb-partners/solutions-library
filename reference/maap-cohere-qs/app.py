@@ -8,7 +8,7 @@ st.set_page_config(page_title="Stocks Recommender", initial_sidebar_state="expan
 tab1, tab2 = st.tabs(["Architecture Diagram", "Stock Recommender App"])
 
 with tab1:
-    st.image("arch_diagram.png", caption="Architecture Diagram", use_column_width=True)
+    st.image("arch_diagram.png", caption="Architecture Diagram", use_container_width=True)
     pass
 
 with tab2:

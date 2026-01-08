@@ -13,4 +13,8 @@ WORKDIR /code
 
 RUN pip install -r requirements.txt
 
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /code
+USER appuser
+
 ENTRYPOINT [ "python3", "main.py" ]

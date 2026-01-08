@@ -13,6 +13,10 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Use existing node user (uid 1000) for security instead of root
+RUN chown -R node:node /app
+USER node
+
 # Expose the port the app runs on (change if needed)
 EXPOSE 3000
 

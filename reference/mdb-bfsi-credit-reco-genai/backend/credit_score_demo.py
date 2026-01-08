@@ -125,6 +125,6 @@ def get_prod_reco(user_profile, user_id, pred, allowed_credit_limit):
     product_recommendations = product_recommendations.replace("\n","").replace('\"', '"').strip()
     return {"productRecommendations": json.loads(product_recommendations)}
 
-if __name__ == "__main__":   # Please do not set debug=True in production
+if __name__ == "__main__":
     # print(get_user_profile(8625))
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=False)

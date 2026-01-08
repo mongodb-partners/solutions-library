@@ -2,6 +2,7 @@ import json
 import mimetypes
 import os
 import re
+import html
 from images import ARCHITECTURE, PLUS
 import gradio as gr
 import requests
@@ -10,8 +11,36 @@ from gradio import Markdown as m
 from langserve import RemoteRunnable
 import asyncio
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from logger import AsyncRemoteLogger
+
+
+def sanitize_xml_input(text: str) -> str:
+    """
+    Sanitize user input to prevent XML injection (XXE) attacks.
+    Removes or escapes XML-related characters and patterns.
+    """
+    if not text or not isinstance(text, str):
+        return text
+
+    # Remove XML declarations and processing instructions
+    text = re.sub(r'<\?xml[^>]*\?>', '', text, flags=re.IGNORECASE)
+
+    # Remove DOCTYPE declarations (prevents XXE)
+    text = re.sub(r'<!DOCTYPE[^>]*>', '', text, flags=re.IGNORECASE | re.DOTALL)
+
+    # Remove ENTITY declarations
+    text = re.sub(r'<!ENTITY[^>]*>', '', text, flags=re.IGNORECASE)
+
+    # Remove xi:include and similar namespace includes
+    text = re.sub(r'<[^>]*xi:include[^>]*>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<[^>]*xinclude[^>]*>', '', text, flags=re.IGNORECASE)
+
+    # Remove CDATA sections
+    text = re.sub(r'<!\[CDATA\[.*?\]\]>', '', text, flags=re.IGNORECASE | re.DOTALL)
+
+    return text
 
 # Create an instance of the logger
 logger = AsyncRemoteLogger(
@@ -26,6 +55,16 @@ app = FastAPI(
     title="MAAP - MongoDB AI Applications Program",
     version="1.0",
     description="MongoDB AI Applications Program",
+)
+
+# CORS middleware - restrict to whitelisted origins only
+# Prevents arbitrary origin reflection with credentials (CVE fix)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$|^https?://[^/]+\.mongodb\.com$|^https?://ec2-[^/]+\.(compute-1\.)?amazonaws\.com(:[0-9]+)?$",
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Claude models dictionary
@@ -48,7 +87,9 @@ async def process_request(message, history, userId, dataSource, tools, llm_model
         url = "http://anthropic-main:8000/rag"
         await logger.aprint(message, history)
         if message and len(message) > 0:
-            query = message["text"].strip()
+            # Sanitize input to prevent XML injection (XXE) attacks
+            raw_text = message["text"].strip()
+            query = sanitize_xml_input(raw_text)
             urls = extract_urls(query)
             await logger.aprint(urls)
             num_files = len(message["files"])

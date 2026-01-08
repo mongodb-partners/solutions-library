@@ -36,6 +36,7 @@ print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 # Each service will be pushed as: $ECR_REGISTRY/$ECR_REPO_PREFIX/<name>:latest
 declare -a SERVICES=(
     "web|apps/web|Dockerfile"
+    "admin-api|services/admin-api|Dockerfile"
     "temporal-fraud-detection|reference/maap-temporal-ai-agent-qs|Dockerfile"
     "cohere-semantic-search|reference/maap-cohere-qs|Dockerfile"
     "langchain-research-agent|reference/langchain-qs|Dockerfile"

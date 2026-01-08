@@ -6,7 +6,7 @@ from langchain_core.messages import ToolMessage
 from langgraph.types import Command
 from langgraph.prebuilt import InjectedState
 from typing import Annotated
-from .utils import CHUNK_SEPERATOR, embedding_model, retriever
+from .utils import CHUNK_SEPERATOR, embedding_model, retriever, extract_n_load_relevant_info
 from langchain_core.language_models import BaseChatModel
 
 from pydantic import BaseModel, Field
@@ -18,7 +18,7 @@ def search_tool(query: str) -> str:
     Args:
         query: The query to search for
     """
-    docs = retriever.get_relevant_documents(query)
+    docs = retriever.invoke(query)
     return CHUNK_SEPERATOR.join([doc.page_content for doc in docs])
 
 def create_rewrite_handoff_tool(*, model: BaseChatModel,  agent_name: str, tool_name: str, tool_description: str) -> BaseTool:
@@ -135,7 +135,7 @@ def web_search_tool(query: str) -> str:
         query: The query to search for
     """
     extract_n_load_relevant_info(query)
-    return search_tool(query)
+    return search_tool.invoke({"query": query})
 
 # from typing import Annotated
 
@@ -194,14 +194,9 @@ def create_grader_handoff_tool(*,model: BaseChatModel, generate_agent_name: str,
         retrieved_messages = state["messages"][-2]
         question = last_agent_message.content
         docs = retrieved_messages.content
+
         positive_tool_message = ToolMessage(
             content=f"Successfully transferred to {generate_agent_name}",
-            name=tool_name,
-            tool_call_id=tool_call_id,
-        )
-
-        negative_tool_message = ToolMessage(
-            content=f"Successfully transferred to {rewrite_agent_name}",
             name=tool_name,
             tool_call_id=tool_call_id,
         )
@@ -209,36 +204,28 @@ def create_grader_handoff_tool(*,model: BaseChatModel, generate_agent_name: str,
         positive_command = Command(
             goto=generate_agent_name,
             graph=Command.PARENT,
-            # NOTE: this is a state update that will be applied to the swarm multi-agent graph (i.e., the PARENT graph)
             update={
                 "messages": [last_agent_message, positive_tool_message],
                 "active_agent": generate_agent_name,
-                # optionally pass the task description to the next agent
                 "task_description": task_description,
             },
         )
 
-        negative_command = Command(
-            goto=rewrite_agent_name,
-            graph=Command.PARENT,
-            # NOTE: this is a state update that will be applied to the swarm multi-agent graph (i.e., the PARENT graph)
-            update={
-                "messages": [last_agent_message, negative_tool_message],
-                "active_agent": rewrite_agent_name,
-                # optionally pass the task description to the next agent
-                "task_description": task_description,
-            },
-        )
-        
-        if grade(question, docs) == "yes":
+        # If no docs were retrieved, proceed to George anyway to generate best-effort response
+        if not docs or docs.strip() == "" or "No relevant docs" in docs:
+            print("---DECISION: NO DOCS FOUND - PROCEEDING TO GENERATE RESPONSE---")
+            return positive_command
+
+        # Grade the retrieved documents
+        grade_result = grade(question, docs)
+
+        if grade_result == "yes":
             print("---DECISION: DOCS RELEVANT---")
             return positive_command
-        elif grade(question, docs) == "no":
-            print("---DECISION: DOCS NOT RELEVANT <REWRITE>---")
-            return negative_command
         else:
-            print("---DECISION: DOCS NOT RELEVANT <AGENT>---")
-            return negative_command
+            # Instead of infinite rewrite loop, proceed to George with available context
+            print("---DECISION: DOCS NOT HIGHLY RELEVANT - PROCEEDING TO GENERATE RESPONSE---")
+            return positive_command
 
     return handoff_to_agent
 

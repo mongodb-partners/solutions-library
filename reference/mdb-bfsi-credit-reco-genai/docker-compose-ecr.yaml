@@ -9,6 +9,8 @@ services:
     ports:
       - "5001:5001"
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
   frontend:
     image: public.ecr.aws/s2e1n3u8/mdb-bfsi-credit-reco-genai-frontend
@@ -20,3 +22,5 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true

@@ -6,6 +6,33 @@ from pathlib import Path
 from typing import Any, AsyncIterator, Callable, Dict, List, Literal, Union
 
 import boto3
+
+
+def sanitize_xml_input(text: str) -> str:
+    """
+    Sanitize user input to prevent XML injection (XXE) attacks.
+    Removes or escapes XML-related characters and patterns.
+    """
+    if not text or not isinstance(text, str):
+        return text
+
+    # Remove XML declarations and processing instructions
+    text = re.sub(r'<\?xml[^>]*\?>', '', text, flags=re.IGNORECASE)
+
+    # Remove DOCTYPE declarations (prevents XXE)
+    text = re.sub(r'<!DOCTYPE[^>]*>', '', text, flags=re.IGNORECASE | re.DOTALL)
+
+    # Remove ENTITY declarations
+    text = re.sub(r'<!ENTITY[^>]*>', '', text, flags=re.IGNORECASE)
+
+    # Remove xi:include and similar namespace includes
+    text = re.sub(r'<[^>]*xi:include[^>]*>', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<[^>]*xinclude[^>]*>', '', text, flags=re.IGNORECASE)
+
+    # Remove CDATA sections
+    text = re.sub(r'<!\[CDATA\[.*?\]\]>', '', text, flags=re.IGNORECASE | re.DOTALL)
+
+    return text
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse
@@ -337,9 +364,13 @@ async def custom_stream(user_inputs: Input) -> AsyncIterator[str]:
 
     # Create agent executor with tools
     agent_executor = _create_agent_with_tools(user_inputs["tools"])
+
+    # Sanitize user input to prevent XML injection (XXE) attacks
+    sanitized_input = sanitize_xml_input(user_inputs["input"])
+
     async for event in agent_executor.astream_events(
         {
-            "input": user_inputs["input"],
+            "input": sanitized_input,
             "chat_history": user_inputs["chat_history"],
         },
         version="v1",

@@ -13,6 +13,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
 # Command to run the application
 CMD ["streamlit", "run", "app.py", "--server.port=8080"]
 # CMD ["python", "app.py"]

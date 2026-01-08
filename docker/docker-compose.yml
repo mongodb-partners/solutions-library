@@ -179,13 +179,27 @@ services:
     build:
       context: ../reference/langchain-qs
       dockerfile: Dockerfile
-    ports:
-      - "${LANGCHAIN_UI_PORT:-8504}:8505"
+    # Internal port only - proxied through langchain-nginx for security
+    expose:
+      - "8505"
     env_file:
       - ../.env
     environment:
       - PYTHONUNBUFFERED=1
       - MONGODB_COLLECTION=rag
+    networks:
+      - solutions-network
+    restart: unless-stopped
+
+  # Nginx proxy for LangChain to mitigate HTTP Request Smuggling (CWE-444)
+  langchain-nginx:
+    image: nginx:alpine
+    ports:
+      - "${LANGCHAIN_UI_PORT:-8504}:8504"
+    volumes:
+      - ../reference/langchain-qs/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - langchain-research-agent
     networks:
       - solutions-network
     restart: unless-stopped

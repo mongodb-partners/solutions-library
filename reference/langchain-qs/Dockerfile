@@ -32,5 +32,8 @@ USER appuser
 # Expose Streamlit port
 EXPOSE 8505
 
-# Run the application
-CMD ["streamlit", "run", "app.py", "--server.port=8505", "--server.address=0.0.0.0"]
+# Run the application with security options
+# --server.enableXsrfProtection=true: Enables XSRF protection
+# --server.enableCORS=false: Disables CORS (handled by reverse proxy)
+# --server.enableWebsocketCompression=false: Mitigates some HTTP smuggling vectors
+CMD ["streamlit", "run", "app.py", "--server.port=8505", "--server.address=0.0.0.0", "--server.enableXsrfProtection=true", "--server.enableCORS=false", "--server.enableWebsocketCompression=false"]

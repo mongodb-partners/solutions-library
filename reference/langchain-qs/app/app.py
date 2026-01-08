@@ -87,10 +87,11 @@ with tab2:
         # Dropdown to choose an LLM model with a button to refresh the model
         add_vertical_space(1)
         llm_model_expander = st.expander("Choose yor LLM model")
-        CHOICES = {"accounts/fireworks/models/llama-v3p3-70b-instruct": "llama-3.3-70B",
-                   "accounts/fireworks/models/mixtral-8x22b-instruct": "mixtral-8x22B",
-                   "accounts/fireworks/models/qwen3-235b-a22b": "qwen3-235B",
-                   "accounts/fireworks/models/deepseek-v3-0324": "deepseek-v3"}
+        # Using inference profile IDs for Claude 3.5 models (us. prefix required)
+        CHOICES = {"us.anthropic.claude-3-5-sonnet-20241022-v2:0": "Claude 3.5 Sonnet v2 (Recommended)",
+                   "us.anthropic.claude-3-5-haiku-20241022-v1:0": "Claude 3.5 Haiku (Fast)",
+                   "anthropic.claude-3-haiku-20240307-v1:0": "Claude 3 Haiku (Budget)",
+                   "anthropic.claude-3-sonnet-20240229-v1:0": "Claude 3 Sonnet"}
 
         def format_func(option):
             return CHOICES[option]

@@ -12,7 +12,6 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.language_models import BaseChatModel
 from langchain_aws import BedrockEmbeddings, ChatBedrock
-from langchain_fireworks import ChatFireworks
 from langgraph.checkpoint.mongodb import MongoDBSaver
 from langchain_core.output_parsers import StrOutputParser
 
@@ -31,11 +30,18 @@ embedding_model = BedrockEmbeddings(
 EMBED_DIMENSION = len(embedding_model.embed_documents(["hello world"])[0])
 print(f"Embedding dimension: {EMBED_DIMENSION}")
 
-def get_llm(model_name: str = "accounts/fireworks/models/llama-v3p3-70b-instruct") -> BaseChatModel:
-    if "fireworks" in model_name:
-        llm = ChatFireworks(model=model_name)
-    else:
-        llm = ChatBedrock(model=model_name)
+def get_llm(model_name: str = "us.anthropic.claude-3-5-sonnet-20241022-v2:0") -> BaseChatModel:
+    """
+    Get LLM instance using AWS Bedrock.
+
+    Uses ChatBedrock with Claude models which have excellent native
+    tool calling support for multi-agent workflows.
+    """
+    llm = ChatBedrock(
+        model_id=model_name,
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        model_kwargs={"temperature": 0.0}  # Use 0.0 for reliable function calling
+    )
     return llm
 
 
@@ -116,7 +122,7 @@ vectorstore = MongoDBAtlasVectorSearch(
 )
 # retriever = vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 5, "post_filter":[{"$addFields": {"score": {"$meta": "vectorSearchScore"}}}, {"$match":{"score": {"$gte": 0.9}}}]})
 retriever = vectorstore.as_retriever(search_type="similarity_score_threshold",
-                search_kwargs={'score_threshold': 0.75})
+                search_kwargs={'score_threshold': 0.5})
 
 # Memory checkpoint saver for graph
 memory_saver = MongoDBSaver(client)
