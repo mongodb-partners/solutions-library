@@ -43,6 +43,18 @@ export function UsageEnquiryModal({
   };
 
   const handleSkip = () => {
+    // Record skip event (fire-and-forget, don't block user)
+    submitUsageEnquiry({
+      name: '',
+      email: '',
+      company: '',
+      role: '',
+      solution_id: solutionId,
+      solution_name: solutionName,
+      skipped: true,
+    }).catch(() => {
+      // Silently ignore errors for skip tracking
+    });
     launchDemo();
   };
 

@@ -17,7 +17,7 @@
   "technologies": ["Temporal", "MongoDB Atlas", "Vector Search", "AWS Bedrock", "Python", "FastAPI", "Streamlit"],
   "category": "Workflow Orchestration",
   "demoUrl": "http://localhost:8505",
-  "sourceUrl": "https://github.com/mongodb-partners/maap-temporal-ai-agent-qs",
+  "sourceUrl": "https://github.com/mongodb-partners/solutions-library/tree/main/reference/maap-temporal-ai-agent-qs",
   "documentation": "/docs/temporal-fraud-detection",
   "ports": {
     "api": 8001,

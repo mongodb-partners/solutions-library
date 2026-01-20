@@ -51,12 +51,18 @@ class UsageEnquiryRepository:
             role=enquiry_data.role,
             solution_id=enquiry_data.solution_id,
             solution_name=enquiry_data.solution_name,
+            skipped=enquiry_data.skipped,
             created_at=now,
             ip_address=ip_address,
             user_agent=user_agent,
         )
 
-        await collection.insert_one(enquiry.model_dump())
+        # Exclude None, empty strings, and False skipped from MongoDB document
+        doc = {
+            k: v for k, v in enquiry.model_dump().items()
+            if v not in (None, "") and not (k == "skipped" and v is False)
+        }
+        await collection.insert_one(doc)
         logger.info(f"Created usage enquiry: {enquiry_id} for solution {enquiry_data.solution_id}")
 
         return enquiry

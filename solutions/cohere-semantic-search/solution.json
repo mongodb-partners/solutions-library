@@ -17,7 +17,7 @@
   "technologies": ["Cohere", "MongoDB Atlas", "Vector Search", "Python", "Streamlit"],
   "category": "Semantic Search",
   "demoUrl": "http://localhost:8503",
-  "sourceUrl": "https://github.com/mongodb-partners/maap-cohere-qs",
+  "sourceUrl": "https://github.com/mongodb-partners/solutions-library/tree/main/reference/maap-cohere-qs",
   "documentation": "/docs/cohere-semantic-search",
   "ports": {
     "api": 8003,

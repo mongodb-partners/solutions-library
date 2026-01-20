@@ -17,7 +17,7 @@
   "technologies": ["Fireworks AI", "MongoDB Atlas", "LangChain", "Python", "Flask", "React"],
   "category": "AI/LLM",
   "demoUrl": "http://localhost:8506",
-  "sourceUrl": "https://github.com/mongodb-partners/mdb-bfsi-credit-reco-genai",
+  "sourceUrl": "https://github.com/mongodb-partners/solutions-library/tree/main/reference/mdb-bfsi-credit-reco-genai",
   "documentation": "/docs/fireworks-inference",
   "ports": {
     "api": 8006,

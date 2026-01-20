@@ -463,6 +463,28 @@ function Layout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+      <footer style={{
+        padding: '12px 24px',
+        textAlign: 'center',
+        fontSize: 12,
+        color: '#889397',
+        backgroundColor: '#f9fbfa',
+        borderTop: '1px solid #e8edeb',
+      }}>
+        Developed by{' '}
+        <a
+          href="https://www.linkedin.com/in/farooqimdd/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color: '#5c6c75',
+            textDecoration: 'underline',
+            textUnderlineOffset: 2,
+          }}
+        >
+          Mohammad Daoud Farooqi
+        </a>
+      </footer>
     </div>
   )
 }

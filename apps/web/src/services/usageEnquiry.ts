@@ -10,6 +10,7 @@ export interface UsageEnquiryData {
   role: string;
   solution_id: string;
   solution_name: string;
+  skipped?: boolean;
 }
 
 export interface UsageEnquiryResponse {

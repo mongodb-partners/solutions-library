@@ -17,7 +17,7 @@
   "technologies": ["LangChain", "LangGraph", "MongoDB Atlas", "Vector Search", "Python", "Streamlit"],
   "category": "AI/LLM",
   "demoUrl": "http://localhost:8504",
-  "sourceUrl": "https://github.com/mongodb-partners/langchain-qs",
+  "sourceUrl": "https://github.com/mongodb-partners/solutions-library/tree/main/reference/langchain-qs",
   "documentation": "/docs/langchain-research-agent",
   "ports": {
     "api": 8004,
